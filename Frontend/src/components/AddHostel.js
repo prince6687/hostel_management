@@ -1,3 +1,4 @@
+
 import React from 'react'
 import styled from 'styled-components'
 import { useState,useEffect } from 'react';
@@ -19,35 +20,38 @@ import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ClearIcon from '@material-ui/icons/Clear';
 import axios from 'axios';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 
-const Inbox = () => {
+const AddHostel = () => {
     const [open, setOpen] = useState(false);
     const [sideBar, setSideBar] = useState(false);
-    const [showInbox, setShowInbox] = useState(false);
-    const [queries, setQueries] = useState([]) ;
-    const [student,setStudent] = useState({}) ;
-    const [reply,setReply] = useState("") ;
+    const [name,setName] = useState(null) ;
+    const [address,setAddress] = useState(null) ;
+    const [gender,setGender] = useState(null) ;
+    const [hostels,setHostels] = useState([]) ;
     const user = sessionStorage ;
     useEffect(()=>{
-        axios.post("http://localhost:8000/admin/findQueries",{
-            user
-        }).then(res =>{ 
-            console.log(res.data)
-            setQueries(res.data) ;
-        })
-        .then(err => console.log(err)) ;
+      axios.post("http://localhost:8000/admin/hostels/all",{user}).then(res=>{
+          console.log(res.data) ;
+          setHostels(res.data)  ;
+      })
     },[])
-    const onSend = ()=>{
-        console.log(reply) ;
-        axios.post("http://localhost:8000/admin/query/",{
-            user:sessionStorage ,
-            content: reply ,
-            query_id : student._id
-        }).then(res=>{
-            alert("Reply added Succesfully !!!") ;
-            window.location.href = "/admin/dashboard/inbox" ;
-        })
+    const onadd = ()=>{
+        if(gender == ""){
+            alert("Please select a Hostel Type !") ;
+            return ;
+        }
+       const user = sessionStorage ;
+       console.log(name,address,gender) ; 
+       axios.post('http://localhost:8000/admin/add/hostel',{
+        user ,
+        gender,
+        name,
+        address
+       }).then(resp=>{
+          if(resp.status == 200){
+              alert("Hostel Added Succesfully !!!") ;
+          }
+       }).catch(err=>alert("An error occured !!!"))
     }
     return (
         <>
@@ -116,9 +120,9 @@ const Inbox = () => {
                         </Link>
                         <Link to="/admin/dashboard/applications" className="left-item">
                             <AssignmentIcon className="left-icon" />
-                            Applications
+                            applications
                         </Link>
-                        <Link to="/admin/dashboard/hostel/add" className="left-item">
+                        <Link to="/admin/dashboard/hostel/add" className="left-item active">
                             <AddIcon className="left-icon" />
                             Add Hostel
                         </Link>
@@ -134,7 +138,7 @@ const Inbox = () => {
                             <AddIcon className="left-icon" />
                             Add Canteen
                         </Link>
-                        <Link to="/admin/dashboard/inbox" className="left-item active">
+                        <Link to="/admin/dashboard/inbox" className="left-item">
                             <EmailIcon className="left-icon" />
                             Indox
                         </Link>
@@ -151,7 +155,7 @@ const Inbox = () => {
                         <div className="head not-mobile">
                             <h2>Admin Dashboard</h2>
                             <div className="left-links">
-                                <p>Dashboard > Inbox</p>
+                                <p>Dashboard > Home</p>
                                 <button>
                                     <ChatBubbleIcon className="icon" />
                                     View Inbox
@@ -159,98 +163,67 @@ const Inbox = () => {
                             </div>
                         </div>
                         <div className="general">
-
-
-                            {
-                                showInbox ? (
-                                    <div className="grand-card">
-                                        <div className="card-top">
-                                            <a onClick={() => setShowInbox(false)}>
-                                                <ArrowBackIosIcon className="icon-link" />
-                                                <>
-                                                    All Inboxes
-                                                </>
-                                            </a>
-                                            <MoreVertIcon className="icon" />
-                                        </div>
-                                        <div className="details2">
-                                            <div className="detail">
-                                                <p className="cat">Subject : </p>
-                                                <p className="res">{student.subject} </p>
-                                            </div>
-                                            <div className="detail">
-                                                <p className="cat">Content : </p>
-                                                <p className="res">{student.message}</p>
-                                            </div>
-                                            <div className="reply">
-                                            <textarea name="" id="" className="detail" placeholder="Reply to the Inbox, write here..." onChange={(e)=>setReply(e.target.value)}></textarea>
-                                            </div>
-                                        </div>
-                                        <div className="btns-new">
-                                            <button className="btn" onClick={onSend}>Send Reply</button>
-                                            <button className="btn red-bg" onClick={() => setShowInbox(false)}>Cancel</button>
-                                        </div>
-                                        <div className="desc">*It is always advised to check the candiates profile to verify that it is not a fake profile.</div>
-                                    </div>
-
-                                ) : (
-                                    <div className="grand-card">
-                                        <div className="card-top">
-                                            <p>Inboxes</p>
-                                            <MoreVertIcon className="icon" />
-                                        </div>
-                                        <div className="details">
-                                            <div className="detail detail-header">
-                                                <div className="room-no">S. no.</div>
-                                                <div className="hostel-name">Subject</div>
-                                                <div className="resident">View</div>
-                                                
-                                            </div>
-                                            {
-                                                queries.length>0?(
-                                                queries.map((item,index)=>
-                                                    <div className="detail">
-                                                    <div className="room-no">{index+1}</div>
-                                                    <div className="hostel-name">{item.subject}</div>
-                                                    <a className="resident" onClick={() =>{setShowInbox(true) ; setStudent(item) }}>
-                                                        <>View Detailed</>
-                                                        <OpenInNewIcon className="icon" /></a>
-                                                </div>)):(<div>No current Messages</div>)
-                                            }
-                                        </div>
-                                    </div>
-
-                                )
-                            }
-
-
-
-                            <div className="two-cards">
-                                <div className="card">
-                                    <div className="card-top">
-                                        <p>Pending</p>
-                                        <MoreVertIcon className="icon" />
-                                    </div>
-                                    <div className="card-mid">
-                                        <h1>{queries.length}</h1>
-                                        <p>queries Pending</p>
-                                    </div>
-                                    <div className="desc">These are the number of queries you have not addressed!</div>
+                            <div className="grand-card">
+                                <div className="card-top">
+                                    <p>Add Hostel</p>
+                                    <MoreVertIcon className="icon" />
                                 </div>
-                                <div className="card">
-                                    <div className="card-top">
-                                        <p>Fees Pending</p>
-                                        <MoreVertIcon className="icon" />
+                                <div className="details">
+                                    <div className="two-details">
+                                        <input type="text" className="detail" placeholder="Hostel Name" onChange={(e)=>setName(e.target.value)}/>
+                                        {/* <input type="text" className="detail" placeholder="Existing Hostel Type"/> */}
+                                        <div className="custom-select">
+                                            <select onChange={(e)=>setGender(e.target.value)}>
+                                                <option value="">Hostel Type</option>
+                                                <option value="Boys">Male</option>
+                                                <option value="Girls">Female</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div className="card-mid">
-                                        <h1>8</h1>
-                                        <p>students with pending fees</p>
-                                    </div>
-                                    <div className="desc">This is the count of students who has not deposited the fees till date.</div>
+                                    <input type="text" className="detail" placeholder="Address" onChange={(e)=>setAddress(e.target.value)}/>
+                                    {/* <input type="text" className="detail" placeholder="Room No."/>
+                                    <div className="two-details">
+                                        <input type="number" className="detail" placeholder="Student per Room"/>
+                                        <input type="number" className="detail" placeholder="Fees per Month"/>
+                                    </div> */}
+                                    {/* <div className="two-details">
+                                        <input type="number" className="detail" placeholder="Room Number Start"/>
+                                        <input type="number" className="detail" placeholder="Room Number End"/>
+                                    </div> */}
+                                    {/* <textarea name="" id="" className="detail" placeholder="Reason for change"></textarea> */}
                                 </div>
+                                <button className="submit-btn" onClick={onadd}>
+                                    Add Hostel
+                                </button>
+                                {/* <div className="desc">*It might happen that at the time you apply for change the rooms aren't free so your request will be added to waiting list and you will get updates on hosterr dashboard regarding it's updates </div> */}
+                            </div>
+                            <div className="multi-cards">
+                                <h3 className="heading">Existing Hostels</h3>
+                                {/* code */}
+                                {
+                                    hostels.length?(
+                                        hostels.map((item,idx) => 
+                                            <div className="card">
+                                    <div className="text">
+                                        <div className="top">{idx+1}. {item.name} ({item.gender}) </div>
+                                        <a href="/" className="link">View Detailed</a>
+                                    </div>
+                                </div>
+                                            )
+
+                                    ):(<>No hostels</>)
+                                }
+                                {/* 
+                                <div className="card">
+                                    <div className="text">
+                                        <div className="top">Jadavpur University - Hostel 1 </div>
+                                        <a href="/" className="link">View Detailed</a>
+                                    </div>
+                                </div>
+                                */}
                             </div>
                         </div>
-
+                                
                     </Right>
                 </div>
             </Container>
@@ -258,7 +231,7 @@ const Inbox = () => {
             <SideBar className={`${sideBar ? 'sidebar show-sidebar' : 'sidebar'}`}>
                 <SbComponentOne>
                     <Link to="/admin/dashboard/new-admin">Home</Link>
-                    <Link to="/admin/dashboard/queries">queries</Link>
+                    <Link to="/admin/dashboard/applications">Applications</Link>
                     <Link to="/admin/dashboard/hostel/add">Add Hostel</Link>
                     <Link to="/admin/dashboard/room/add">Add Rooms</Link>
                     <Link to="/admin/dashboard/guest-room/add">Add Guest House</Link>
@@ -275,7 +248,7 @@ const Inbox = () => {
     )
 }
 
-export default Inbox
+export default AddHostel
 
 const Container = styled.div`
     min-height: 100vh;
@@ -627,98 +600,20 @@ const Right = styled.div`
         .icon{
             cursor: pointer;
         }
-        a{
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            
-            .icon-link{
-                font-size: 1.2rem;
-            }
-        }
     }
     .details{
         margin-top: 30px;
         .detail{
+            border: none;
+            background-color: rgb(238, 238, 238);
             width: 100%;
-            background-color: #f5e8e8;
-            padding: 0.5rem;
-            border-radius: 5px; 
-            margin-bottom: 5px;  
+            padding: 0.75rem 1rem;
             font-size: 0.8rem;
-            font-weight: 300;
-
-            display: flex;
-            align-items: center;
-
-            div{
-                overflow: hidden;
-            }
-            
-            .room-no{
-                width: 15%;
-                border-right: 1px solid #d1b9b9;
-                display: flex;
-                justify-content: center;
-            }       
-            
-            .hostel-name{
-                flex: 1;
-                border-right: 1px solid #d1b9b9;
-                display: flex;
-                justify-content: center;
-            }
-
-
-            .fees{
-                width: 15%;
-                display: flex;
-                justify-content: center;
-            }
-            
-            .resident{
-                width: 20%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                .icon{
-                    fill: cornflowerblue;
-                    font-size: 1rem;
-                    margin-left: 2px;
-                }
-            }
-            
-            /*code here - desktop */
+            border: none;
+            outline: none;
+            margin-bottom: 5px;
+            border-radius: 5px;
         }
-
-        .detail-header{
-            background-color: #585353;
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 600;
-
-
-            .room-no{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .hostel-name{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .gender{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .fees{
-                color: white;
-            }
-            .resident{
-                color: white;
-            }
-        }
-
         .two-details{
             display: flex;
             justify-content: space-between;
@@ -751,67 +646,6 @@ const Right = styled.div`
             height: 200px;
         }
     }
-
-    .btns-new{
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            
-            .btn{
-                padding: 8px 10px;
-                cursor: pointer;
-                border-radius: 5px;
-                margin-right: 5px;
-                border: none;
-                font-size: 0.8rem;
-                background-color: #7690bf;
-                color: white;
-            }
-
-            .red-bg{
-                background-color: #d16969;
-            }
-        }
-
-    .details2{
-        margin-top: 30px;
-
-        .detail{
-            display: flex;
-            align-items: flex-start;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-
-            .cat{
-                font-weight: 600;
-                min-width: 100px;
-            }
-
-            .res{
-                font-weight: 200;
-                margin-left: 10px;
-                font-size: 0.85rem;
-            }
-
-        }
-
-        .reply{
-            margin-top: 25px;
-            textarea{
-                width: 100%;
-                height: 200px;
-                padding: 1rem;
-                font-size: 0.8rem;
-                background-color: #efeded;
-                outline: none;
-                border: none;
-                border-radius: 5px;
-            }
-        }
-
-        
-    }
-            
     .submit-btn{
         border: none;
         background-color: cornflowerblue;
@@ -822,65 +656,65 @@ const Right = styled.div`
         cursor: pointer;
     }
     .desc{
-        font-size: 0.7rem;
+        font-size: 0.6rem;
         position: absolute;
         bottom: 5px;
         color: grey;
     }
 }
-        .two-cards{
+        .multi-cards{
             height: 520px;
             width: 25%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             padding-right: 10px;
+
+            .heading{
+                background-color: cornflowerblue;
+                color: white;
+                margin: 10px 2px;
+                margin-top: 0;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+                padding: 5px 10px;
+                border-radius: 10px;
+                width: 100%;
+                font-size: 1rem;
+                text-transform: uppercase;
+                font-weight: 600;
+                letter-spacing: 0.075rem;
+            }
+
             .card{
                 width: 100%;
-                height: 250px;
+                height: 77px;
                 background-color: white;
                 box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
                 border-radius: 10px;
                 margin-bottom: 10px;
                 margin-right: 1%;
-                padding: 20px;
+                padding: 10px;
                 display: flex;
-                flex-direction: column;
                 justify-content: space-between;
+                align-items: center;
     
-                .card-top{
+                img{
+                    height: 90%;
+                }
+
+                .text{
+                    flex: 1;
+                    margin-left: 10px;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-    
-                    p{
-                        font-size: 1rem;
+                    flex-direction: column;
+                    justify-content: center;
+                    
+                    .top{
+                        font-size: 0.9rem;
+                        font-weight: 600;
                     }
-    
-                    .icon{
-                        cursor: pointer;
+                    .link{
+                        font-size: 0.7rem;
                     }
-    
-                }
-                .card-mid{
-                    text-align: center;
-                    h1{
-                        color: orange;
-                        font-size: 5rem;
-                        line-height: 5rem;
-                    }
-                    p{
-                        color: orange;
-                        font-size: 0.8rem;
-                    }
-                    img{
-                        height: 7rem;
-                    }
-                }
-                .desc{
-                    font-size: 0.7rem;
-                    color: grey;
-                    text-align: center;
                 }
             }
         }
@@ -1017,60 +851,44 @@ const Right = styled.div`
         max-width: 90vw;
     }
 }
-        .two-cards{
+.multi-cards{
             height: auto;
             width: 100%;
+            margin-top: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 0;
+            padding-right: 0px;
+
             .card{
                 width: 100%;
-                height: 250px;
+                height: 80px;
                 background-color: white;
                 box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
                 border-radius: 10px;
-                margin-top: 10px;
-                margin-bottom: 0;
-                margin-right: 0;
-                padding: 20px;
+                margin-bottom: 10px;
+                margin-right: 1%;
+                padding: 10px;
                 display: flex;
-                flex-direction: column;
                 justify-content: space-between;
+                align-items: center;
     
-                .card-top{
+                img{
+                    height: 90%;
+                }
+
+                .text{
+                    flex: 1;
+                    margin-left: 10px;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-    
-                    p{
-                        font-size: 1rem;
+                    flex-direction: column;
+                    justify-content: center;
+                    
+                    .top{
+                        font-size: 0.9rem;
                     }
-    
-                    .icon{
-                        cursor: pointer;
+                    .link{
+                        font-size: 0.7rem;
                     }
-    
-                }
-                .card-mid{
-                    text-align: center;
-                    h1{
-                        color: orange;
-                        font-size: 5rem;
-                        line-height: 5rem;
-                    }
-                    p{
-                        color: orange;
-                        font-size: 0.8rem;
-                    }
-                    img{
-                        height: 7rem;
-                    }
-                }
-                .desc{
-                    font-size: 0.7rem;
-                    color: grey;
-                    text-align: center;
                 }
             }
         }

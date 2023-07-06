@@ -1,54 +1,62 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Fade from 'react-reveal/Fade';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import AirlineSeatIndividualSuiteIcon from '@material-ui/icons/AirlineSeatIndividualSuite';
 import TranslateIcon from '@material-ui/icons/Translate';
 import CloseIcon from '@material-ui/icons/Close';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import HomeIcon from '@material-ui/icons/Home';
-import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import EmailIcon from '@material-ui/icons/Email';
-import AddIcon from '@material-ui/icons/Add';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import RoomIcon from '@material-ui/icons/Room';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import CachedIcon from '@material-ui/icons/Cached';
+import EmojiFoodBeverageIcon from '@material-ui/icons/EmojiFoodBeverage';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import LocalLaundryServiceIcon from '@material-ui/icons/LocalLaundryService';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ClearIcon from '@material-ui/icons/Clear';
 import axios from 'axios';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import Dashboard from '@material-ui/icons/Dashboard';
 
-const Inbox = () => {
+
+const DashBoardRoomDetails = () => {
     const [open, setOpen] = useState(false);
     const [sideBar, setSideBar] = useState(false);
-    const [showInbox, setShowInbox] = useState(false);
-    const [queries, setQueries] = useState([]) ;
-    const [student,setStudent] = useState({}) ;
-    const [reply,setReply] = useState("") ;
-    const user = sessionStorage ;
-    useEffect(()=>{
-        axios.post("http://localhost:8000/admin/findQueries",{
+    const [hosteldetails, setHostel] = useState({});
+    const [admin, setAdmin] = useState("");
+    const [address,setAddress] = useState(""); 
+    const user = sessionStorage;
+    let date = new Date();
+    let day = date.getDate();
+    console.log(day);
+    useEffect(() => {
+        axios.post("http://localhost:8000/hostel/getdetails", {
             user
-        }).then(res =>{ 
-            console.log(res.data)
-            setQueries(res.data) ;
-        })
-        .then(err => console.log(err)) ;
-    },[])
-    const onSend = ()=>{
-        console.log(reply) ;
-        axios.post("http://localhost:8000/admin/query/",{
-            user:sessionStorage ,
-            content: reply ,
-            query_id : student._id
-        }).then(res=>{
-            alert("Reply added Succesfully !!!") ;
-            window.location.href = "/admin/dashboard/inbox" ;
-        })
-    }
+        }).then(res => {
+            console.log(res.data);
+            console.log(res.data) ;
+            setHostel(res.data[0]);
+            setAdmin(res.data[1]);
+            var add ;
+            if(res.data[0].hostel)
+            {
+                 add = res.data[0].hostel.hostelId.address ;
+            }
+            else add = res.data[0].address ;
+            add = add.replaceAll(',','') ;
+            add = add.replaceAll('  ',' ') ;
+            add = add.replaceAll(' ','+') ;
+            console.log(add) ;
+            setAddress(add) ;
+        }).catch(err => console.log(err));
+    }, [])
+
     return (
         <>
             {
@@ -79,7 +87,7 @@ const Inbox = () => {
                             Hosterr
                         </a>
                         <div className="admin mobile-only">
-                            Admin
+                            Student
                         </div>
                         <div className="together">
                             <button className="lang" onClick={() => setOpen(true)}>
@@ -110,162 +118,215 @@ const Inbox = () => {
                                 <MenuIcon className="left-icon-mob" />
                             </div>
                         </div>
-                        <Link to="/admin/dashboard/new-admin" className="left-item">
+                        <Link to="/user/dashboard/home" className="left-item">
                             <HomeIcon className="left-icon" />
                             Home
                         </Link>
-                        <Link to="/admin/dashboard/applications" className="left-item">
-                            <AssignmentIcon className="left-icon" />
-                            Applications
+                        <Link to="/user/dashboard/room/details" className="left-item active">
+                            <RoomIcon className="left-icon" />
+                            Room details
                         </Link>
-                        <Link to="/admin/dashboard/hostel/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Hostel
+                        <Link to="/user/dashboard/room/change" className="left-item">
+                            <CachedIcon className="left-icon" />
+                            Room Change
                         </Link>
-                        <Link to="/admin/dashboard/room/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Rooms
+                        <Link to="/user/dashboard/canteen" className="left-item">
+                            <EmojiFoodBeverageIcon className="left-icon" />
+                            Hostel Canteen
                         </Link>
-                        <Link to="/admin/dashboard/guest-room/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Guest House
+                        <Link to="/user/dashboard/guest-house/req" className="left-item">
+                            <AirlineSeatIndividualSuiteIcon className="left-icon" />
+                            Guest House
                         </Link>
-                        <Link to="/admin/dashboard/canteen/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Canteen
-                        </Link>
-                        <Link to="/admin/dashboard/inbox" className="left-item active">
-                            <EmailIcon className="left-icon" />
-                            Indox
-                        </Link>
-                        <Link to="/admin/dashboard/accesslogs" className="left-item">
+                        <Link to="/user/dashboard/contact-admin" className="left-item">
                             <SupervisorAccountIcon className="left-icon" />
-                            Accommodation Details
+                            Contact Admin
                         </Link>
-                        <Link to="/admin/dashboard/profile" className="left-item">
+                        <Link to="/user/dashboard/profile" className="left-item">
                             <AccountCircleIcon className="left-icon" />
                             My profile
                         </Link>
                     </Left>
                     <Right>
                         <div className="head not-mobile">
-                            <h2>Admin Dashboard</h2>
+                            <h2>Student Dashboard</h2>
                             <div className="left-links">
-                                <p>Dashboard > Inbox</p>
+                                <p>Dashboard > Room Details</p>
                                 <button>
-                                    <ChatBubbleIcon className="icon" />
-                                    View Inbox
+                                    <AddCircleIcon className="icon" />
+                                    Create New
                                 </button>
                             </div>
                         </div>
                         <div className="general">
-
-
-                            {
-                                showInbox ? (
-                                    <div className="grand-card">
-                                        <div className="card-top">
-                                            <a onClick={() => setShowInbox(false)}>
-                                                <ArrowBackIosIcon className="icon-link" />
-                                                <>
-                                                    All Inboxes
-                                                </>
-                                            </a>
-                                            <MoreVertIcon className="icon" />
+                            <div className="grand-card">
+                                <div className="card-top">
+                                    <p>Room Details</p>
+                                    <MoreVertIcon className="icon" />
+                                </div>
+                                {hosteldetails.hostel ? (
+                                    <div className="details">
+                                         <div className="detail">
+                                            <p className="cat">College :</p>
+                                            <p className="res"> <b>{hosteldetails.hostel.hostelId.college}</b></p>
                                         </div>
-                                        <div className="details2">
-                                            <div className="detail">
-                                                <p className="cat">Subject : </p>
-                                                <p className="res">{student.subject} </p>
-                                            </div>
-                                            <div className="detail">
-                                                <p className="cat">Content : </p>
-                                                <p className="res">{student.message}</p>
-                                            </div>
-                                            <div className="reply">
-                                            <textarea name="" id="" className="detail" placeholder="Reply to the Inbox, write here..." onChange={(e)=>setReply(e.target.value)}></textarea>
-                                            </div>
+                                        <div className="detail">
+                                            <p className="cat">1. Room No. :</p>
+                                            <p className="res"> {hosteldetails.hostel.roomno}</p>
                                         </div>
-                                        <div className="btns-new">
-                                            <button className="btn" onClick={onSend}>Send Reply</button>
-                                            <button className="btn red-bg" onClick={() => setShowInbox(false)}>Cancel</button>
+                                        <div className="detail">
+                                            <p className="cat">2. Hostel Name :</p>
+                                            <p className="res"> {hosteldetails.hostel.hostelId.name}</p>
                                         </div>
-                                        <div className="desc">*It is always advised to check the candiates profile to verify that it is not a fake profile.</div>
+                                        <div className="detail">
+                                            <p className="cat">3. Room Type : </p>
+                                            <p className="res">Normal</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">4. Belongs to PWD student : </p>
+                                            <p className="res">No</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">5. Room owner(s) : </p>
+                                            <p className="res">{admin}</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">6. Fees (PM) : </p>
+                                            <p className="res">{hosteldetails.hostel.fees}</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">7. Staying From : </p>
+                                            <p className="res">14 February, 2020</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">8. Due Payment : </p>
+                                            <p className="res">{!sessionStorage.getItem("amount") ? (<span>0</span>) : (<span>{sessionStorage.getItem("amount")}</span>)}</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">9. Total Room Services : </p>
+                                            <p className="res">{31 - day} left out of 31</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">10. Room Change: </p>
+                                            <p className="res">Allowed</p>
+                                        </div>
+                                        <button className="leave-room-btn">
+                                            Leave Room
+                                        </button>
+                                        <div className="room-images">
+                                            <img src="https://bizimages.withfloats.com/tile/5e4b9c8fce486d0001593c52.jpg" alt="" />
+                                            <img src="https://m.media-amazon.com/images/I/71DXmXYIXFL._SL1133_.jpg" alt="" />
+                                        </div>
                                     </div>
-
                                 ) : (
-                                    <div className="grand-card">
-                                        <div className="card-top">
-                                            <p>Inboxes</p>
-                                            <MoreVertIcon className="icon" />
+                                    <div className="details">
+                                        <div className="detail">
+                                            <p className="cat">College :</p>
+                                            <p className="res"> <b>Jadavpur University</b></p>
                                         </div>
-                                        <div className="details">
-                                            <div className="detail detail-header">
-                                                <div className="room-no">S. no.</div>
-                                                <div className="hostel-name">Subject</div>
-                                                <div className="resident">View</div>
-                                                
-                                            </div>
-                                            {
-                                                queries.length>0?(
-                                                queries.map((item,index)=>
-                                                    <div className="detail">
-                                                    <div className="room-no">{index+1}</div>
-                                                    <div className="hostel-name">{item.subject}</div>
-                                                    <a className="resident" onClick={() =>{setShowInbox(true) ; setStudent(item) }}>
-                                                        <>View Detailed</>
-                                                        <OpenInNewIcon className="icon" /></a>
-                                                </div>)):(<div>No current Messages</div>)
-                                            }
+                                        <div className="detail">
+                                            <p className="cat">1. Room No. :</p>
+                                            <p className="res"> --</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">2. Hostel Name :</p>
+                                            <p className="res"> Not allocated yet</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">3. Room Type : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">4. Belongs to PWD student : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">5. Room owner(s) : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">6. Fees (PM) : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">7. Staying From : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">8. Due Payment : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">9. Total Room Services : </p>
+                                            <p className="res">--</p>
+                                        </div>
+                                        <div className="detail">
+                                            <p className="cat">10. Room Change: </p>
+                                            <p className="res">--</p>
                                         </div>
                                     </div>
-
-                                )
-                            }
-
-
-
-                            <div className="two-cards">
+                                )}
+                            </div>
+                            <div className="multi-cards">
+                                {/* code */}
                                 <div className="card">
-                                    <div className="card-top">
-                                        <p>Pending</p>
-                                        <MoreVertIcon className="icon" />
+                                    <img src="https://www.just.edu.jo/Units_and_offices/Offices/IRO/PublishingImages/Pages/default/3-512.png" alt="" />
+                                    <div className="text">
+                                        <div className="top">Your Hostel</div>
+                                        <a target="_blank" href={`https://www.google.co.in/maps/search/${address}`} className="link">View Address</a>
                                     </div>
-                                    <div className="card-mid">
-                                        <h1>{queries.length}</h1>
-                                        <p>queries Pending</p>
-                                    </div>
-                                    <div className="desc">These are the number of queries you have not addressed!</div>
                                 </div>
                                 <div className="card">
-                                    <div className="card-top">
-                                        <p>Fees Pending</p>
-                                        <MoreVertIcon className="icon" />
+                                    <img src="https://www.nicepng.com/png/full/352-3526091_vector-icon-of-an-airplane-gloucester-road-tube.png" alt="" />
+                                    <div className="text">
+                                        <div className="top">Find Airport</div>
+                                        <a target="_blank" href={`https://www.google.co.in/maps/search/airport+near+${address}`} className="link">View Nearest Airport</a>
                                     </div>
-                                    <div className="card-mid">
-                                        <h1>8</h1>
-                                        <p>students with pending fees</p>
-                                    </div>
-                                    <div className="desc">This is the count of students who has not deposited the fees till date.</div>
                                 </div>
+                                <div className="card">
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqJ7CDsOepm3PNLGC2918je2zk9BZZtyVt6xDG4FA32__pKru5Lq3WSf0NRGTuHvj0SZY&usqp=CAU" alt="" />
+                                    <div className="text">
+                                        <div className="top">Find Railway Station</div>
+                                        <a target="_blank" href={`https://www.google.co.in/maps/search/railwaystation+near+${address}`} className="link">View Nearest Railway Station</a>
+                                    </div>
+                                </div>
+                                <div className="card">
+                                    <img src="https://cdn0.iconfinder.com/data/icons/health-icons-rounded/110/Hospital-512.png" alt="" />
+                                    <div className="text">
+                                        <div className="top">Find Hospital</div>
+                                        <a target="_blank" href={`https://www.google.co.in/maps/search/hospitals+near+${address}`} className="link" >View Nearest Hospital</a>
+                                    </div>
+                                </div>
+                                <div className="card">
+                                    <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/medicine-510-768425.png" alt="" />
+                                    <div className="text">
+                                        <div className="top">Find Pharmacy Store</div>
+                                        <a target="_blank" href={`https://www.google.co.in/maps/search/pharmacy+near+${address}`} className="link">View Nearest Pharmacy Store</a>
+                                    </div>
+                                </div>
+                                <div className="card">
+                                    <img src="https://www.millastellan.com/assets/icons/others.png" alt="" />
+                                    <div className="text">
+                                        <div className="top">Find Stationary</div>
+                                        <a target="_blank" href={`https://www.google.co.in/maps/search/stationery+near+${address}`} className="link">View Nearest Stationary</a>
+                                    </div>
+                                </div>
+                                
                             </div>
                         </div>
-
                     </Right>
                 </div>
             </Container>
 
             <SideBar className={`${sideBar ? 'sidebar show-sidebar' : 'sidebar'}`}>
                 <SbComponentOne>
-                    <Link to="/admin/dashboard/new-admin">Home</Link>
-                    <Link to="/admin/dashboard/queries">queries</Link>
-                    <Link to="/admin/dashboard/hostel/add">Add Hostel</Link>
-                    <Link to="/admin/dashboard/room/add">Add Rooms</Link>
-                    <Link to="/admin/dashboard/guest-room/add">Add Guest House</Link>
-                    <Link to="/admin/dashboard/canteen/add">Add Canteen</Link>
-                    <Link to="/admin/dashboard/inbox">Inbox</Link>
-                    <Link to="/admin/dashboard/accesslogs">Accommodation Details</Link>
-                    <Link to="/admin/dashboard/profile">My Profile</Link>
+                    <Link to="/user/dashboard/home">Home</Link>
+                    <Link to="/user/dashboard/room/details">Room Details</Link>
+                    <Link to="/user/dashboard/room/change">Room Change</Link>
+                    <Link to="/user/dashboard/contact-admin">Contact Admin</Link>
+                    <Link to="/user/dashboard/canteen">Canteen</Link>
+                    <Link to="/user/dashboard/guest-house/req">Guest House</Link>
+                    <Link to="/user/dashboard/profile">My profile</Link>
                 </SbComponentOne>
                 <RemoveSideBar onClick={(e) => setSideBar(false)}>
                     <ClearIcon style={{ cursor: "pointer", fontSize: '1.5rem', fill: 'white' }} />
@@ -275,7 +336,7 @@ const Inbox = () => {
     )
 }
 
-export default Inbox
+export default DashBoardRoomDetails
 
 const Container = styled.div`
     min-height: 100vh;
@@ -288,19 +349,23 @@ const Container = styled.div`
         display: flex;
         justify-content: space-between;
         flex: 1;
+
         @media only screen and (max-width: 600px){
             justify-content: flex-start;
             flex-direction: column;
         }
     }
+
     .together{
         display: flex;
         align-items: center;
     }
+
     a{
         color: cornflowerblue;
         cursor: pointer;
     }
+
     .mobile-only{
         visibility: hidden;
     }
@@ -336,11 +401,13 @@ const PageOneHeader = styled.div`
             font-weight: 700;
             text-decoration: none;
         }
+
         .icon-one{
             fill: white;
             font-size: 1.2rem;
             margin-right: 6px;
         }
+
         .lang{
             display: flex;
             align-items: center;
@@ -354,6 +421,7 @@ const PageOneHeader = styled.div`
             padding: 8px 15px;
             border-radius: 15px;
         }
+
         .lang:hover{
             background-color: #a1a6dd;
             transition-duration: 250ms;
@@ -367,8 +435,10 @@ const PageOneHeader = styled.div`
             cursor: pointer;
             border-radius: 20px;
             font-weight: 500;
+
             display: flex;
             align-items: center;
+
             .icon{
                 fill: #333;
                 margin-right: 5px;
@@ -376,6 +446,8 @@ const PageOneHeader = styled.div`
             }
         }
     }
+
+
     .two{
         height: 42px;
         background-color: #f3f5f7;
@@ -383,11 +455,14 @@ const PageOneHeader = styled.div`
         align-items: center;
         justify-content: center;
         font-size: 0.7rem;
+
         border-bottom: 1px solid #ebdfdf;
+
         .two-link{
             margin-left: 5px;
         }
     }
+
     @media only screen and (max-width: 600px) {
         .one{
             height: 54px;
@@ -399,6 +474,7 @@ const PageOneHeader = styled.div`
                 font-weight: 700;
                 text-decoration: none;
             }
+
             .admin{
                 font-size: 0.55rem;
                 margin-left: 5px;
@@ -410,15 +486,19 @@ const PageOneHeader = styled.div`
             .lang{
                 visibility: hidden;
             }
+
             .btn{
                 visibility: hidden;
                 
             }
+
             .m-icon{
                 fill: white;
                 font-size: 2rem;
             }
         }
+
+
         .two{
             height: 42px;
             background-color: #f3f5f7;
@@ -426,6 +506,7 @@ const PageOneHeader = styled.div`
             align-items: center;
             justify-content: center;
             font-size: 0.7rem;
+
             .two-link{
                 margin-left: 5px;
             }
@@ -439,6 +520,7 @@ const Left = styled.div`
     background-color: #333;
     display: flex;
     flex-direction: column;
+
     .left-header{
         width: 100%;
         display: flex;
@@ -451,6 +533,7 @@ const Left = styled.div`
         background-color: #585353;
         padding: 10px;
         margin-bottom: 25px;
+
         div{
             display: flex;
             align-items: center;
@@ -460,12 +543,14 @@ const Left = styled.div`
             text-transform: uppercase;
             letter-spacing: 0.15rem;
         }
+
         .left-icon{
             fill: white;
             margin-right: 10px;
             font-size: 2rem;
         }
     }
+
     .left-item{
         display: flex;
         align-items: center;
@@ -481,21 +566,25 @@ const Left = styled.div`
         letter-spacing: 0.1rem;
         color: grey;
         text-decoration: none;
+
         .left-icon{
             fill: grey;
             font-size: 1.25rem;
             margin: -4px 10px 0 0;
         }
     }
+
     
     .left-item:hover{
         background-color: #0000006b;
         transition-duration: 250ms;
         color: white;
+
         .left-icon{
             fill: white;
         }
     }
+
     .active{
         background-color: #b9aaaa69;
         color: white;
@@ -504,49 +593,61 @@ const Left = styled.div`
             fill: white;
         }
     }
+
     .active:hover{
         background-color: #b9aaaa69;
     }
+
+
+
     @media only screen and (max-width: 600px){
         width: 100%;
         background-color: #333;
         display: flex;
         flex-direction: column;
         
+
         .left-header{
             font-size: 1rem;
             padding: 10px;
             margin-bottom: 0;
             justify-content: space-between;
             background-color: #5c63a9;
+
             .left-icon{
                 fill: white;
                 margin-right: 10px;
                 font-size: 1.4rem;
             }
+
             .left-icon-mob{
                 fill: white;
                 font-size: 2rem;
             }
+
             div{
                 color: white;
+                font-size: 1rem;
                 display: flex;
                 align-items: center;
-                font-size: 1rem;
             }
         }
+
         .left-item{
             display: none;
         }
+
         
         .left-item:hover{
             background-color: #0000006b;
             transition-duration: 250ms;
             color: white;
+
             .left-icon{
                 fill: white;
             }
         }
+
         .active{
             background-color: #b9aaaa69;
             color: white;
@@ -555,15 +656,19 @@ const Left = styled.div`
                 fill: white;
             }
         }
+
         .active:hover{
             background-color: #b9aaaa69;
         }
+
     }
+
 `
 
 const Right = styled.div`
     flex: 1;
     background-color: #edf1f5;
+
     .head{
         padding: 16px 24px;
         box-shadow: 1px 0 20px rgb(0 0 0 / 8%);
@@ -571,19 +676,23 @@ const Right = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         h2{
             font-weight: 400;
             font-size: 1.25rem;
         }
+
         .left-links{
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             p{
                 font-size: 0.8rem;
                 color: grey;
                 margin-right: 15px;
             }
+
             button{
                 display: flex;
                 align-items: center;
@@ -602,292 +711,130 @@ const Right = styled.div`
             }
         }
     }
+
     .general{
         padding: 1.2rem;
         padding-right: 0;
+
         display: flex;
         justify-content: space-between;
         /* align-items: center; */
+
         .grand-card{
-    position: relative;
-    height: auto;
-    width: 74%;
-    background-color: white;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
-    border-radius: 10px;
-    margin-right: 1%;
-    padding: 1rem;
-    .card-top{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        p{
-            font-size: 1rem;
-        }
-        .icon{
-            cursor: pointer;
-        }
-        a{
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            
-            .icon-link{
-                font-size: 1.2rem;
-            }
-        }
-    }
-    .details{
-        margin-top: 30px;
-        .detail{
-            width: 100%;
-            background-color: #f5e8e8;
-            padding: 0.5rem;
-            border-radius: 5px; 
-            margin-bottom: 5px;  
-            font-size: 0.8rem;
-            font-weight: 300;
+            min-height: 512px;
+            width: 74%;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+            border-radius: 10px;
+            margin-right: 1%;
+            padding: 1rem;
 
-            display: flex;
-            align-items: center;
-
-            div{
-                overflow: hidden;
-            }
-            
-            .room-no{
-                width: 15%;
-                border-right: 1px solid #d1b9b9;
+            .card-top{
                 display: flex;
-                justify-content: center;
-            }       
-            
-            .hostel-name{
-                flex: 1;
-                border-right: 1px solid #d1b9b9;
-                display: flex;
-                justify-content: center;
-            }
-
-
-            .fees{
-                width: 15%;
-                display: flex;
-                justify-content: center;
-            }
-            
-            .resident{
-                width: 20%;
-                display: flex;
-                justify-content: center;
+                justify-content: space-between;
                 align-items: center;
 
-                .icon{
-                    fill: cornflowerblue;
+                p{
                     font-size: 1rem;
-                    margin-left: 2px;
                 }
-            }
-            
-            /*code here - desktop */
-        }
 
-        .detail-header{
-            background-color: #585353;
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 600;
-
-
-            .room-no{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .hostel-name{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .gender{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .fees{
-                color: white;
-            }
-            .resident{
-                color: white;
-            }
-        }
-
-        .two-details{
-            display: flex;
-            justify-content: space-between;
-            .detail{
-                width: 49.5%;
-            }
-            
-            .custom-select{
-                width: 49.5%;
-                margin-bottom: 5px;
-                border-radius: 5px;
-                background-color: rgb(238, 238, 238);
-                display: grid;
-                place-items: center;
-                padding: 10px;
-                select{
-                    border: none;
-                    background-color: rgb(238, 238, 238);
-                    width: 100%;
-                    font-size: 0.8rem;
-                    border: none;
-                    outline: none;
-                    border-radius: 5px;
+                .icon{
                     cursor: pointer;
                 }
             }
-        }
-        textarea{
-            width: 100%;
-            height: 200px;
-        }
-    }
 
-    .btns-new{
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            
-            .btn{
-                padding: 8px 10px;
-                cursor: pointer;
-                border-radius: 5px;
-                margin-right: 5px;
-                border: none;
-                font-size: 0.8rem;
-                background-color: #7690bf;
-                color: white;
-            }
+            .details{
+                margin-top: 30px;
 
-            .red-bg{
-                background-color: #d16969;
-            }
-        }
+                .detail{
+                    display: flex;
+                    align-items: center;
+                    font-size: 0.9rem;
+                    margin-bottom: 10px;
 
-    .details2{
-        margin-top: 30px;
+                    .cat{
+                        font-weight: 600;
+                    }
 
-        .detail{
-            display: flex;
-            align-items: flex-start;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
+                    .res{
+                        font-weight: 200;
+                        margin-left: 10px;
+                        font-size: 0.85rem;
+                    }
+                }
 
-            .cat{
-                font-weight: 600;
-                min-width: 100px;
-            }
+                .leave-room-btn{
+                    font-size: 0.9rem;
+                    border: none;
+                    background-color: #d56060;
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                }
 
-            .res{
-                font-weight: 200;
-                margin-left: 10px;
-                font-size: 0.85rem;
-            }
+                .room-images{
+                    display: flex;
+                    margin-top: 30px;
 
-        }
-
-        .reply{
-            margin-top: 25px;
-            textarea{
-                width: 100%;
-                height: 200px;
-                padding: 1rem;
-                font-size: 0.8rem;
-                background-color: #efeded;
-                outline: none;
-                border: none;
-                border-radius: 5px;
+                    img{
+                        height: 140px;
+                        border-radius: 10px;
+                        margin-right: 5px;
+                    }
+                }
             }
         }
 
-        
-    }
-            
-    .submit-btn{
-        border: none;
-        background-color: cornflowerblue;
-        color: white;
-        font-size: 0.75rem;
-        padding: 0.75rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .desc{
-        font-size: 0.7rem;
-        position: absolute;
-        bottom: 5px;
-        color: grey;
-    }
-}
-        .two-cards{
+        .multi-cards{
             height: 520px;
             width: 25%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             padding-right: 10px;
+
             .card{
                 width: 100%;
-                height: 250px;
+                height: 77px;
                 background-color: white;
                 box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
                 border-radius: 10px;
                 margin-bottom: 10px;
                 margin-right: 1%;
-                padding: 20px;
+                padding: 10px;
                 display: flex;
-                flex-direction: column;
                 justify-content: space-between;
+                align-items: center;
     
-                .card-top{
+                img{
+                    height: 90%;
+                }
+
+                .text{
+                    flex: 1;
+                    margin-left: 10px;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-    
-                    p{
-                        font-size: 1rem;
+                    flex-direction: column;
+                    justify-content: center;
+                    
+                    .top{
+                        font-size: 0.9rem;
                     }
-    
-                    .icon{
-                        cursor: pointer;
+                    .link{
+                        font-size: 0.7rem;
                     }
-    
-                }
-                .card-mid{
-                    text-align: center;
-                    h1{
-                        color: orange;
-                        font-size: 5rem;
-                        line-height: 5rem;
-                    }
-                    p{
-                        color: orange;
-                        font-size: 0.8rem;
-                    }
-                    img{
-                        height: 7rem;
-                    }
-                }
-                .desc{
-                    font-size: 0.7rem;
-                    color: grey;
-                    text-align: center;
                 }
             }
         }
+
+
         
     }
+
+
+
     @media only screen and (max-width: 600px){
         flex: 1;
+
         .head{
             padding: 16px 24px;
             box-shadow: 1px 0 20px rgb(0 0 0 / 8%);
@@ -895,19 +842,23 @@ const Right = styled.div`
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             h2{
                 font-weight: 400;
                 font-size: 1.25rem;
             }
+
             .left-links{
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+
                 p{
                     font-size: 0.8rem;
                     color: grey;
                     margin-right: 15px;
                 }
+
                 button{
                     display: flex;
                     align-items: center;
@@ -926,155 +877,105 @@ const Right = styled.div`
                 }
             }
         }
+
         .general{
         padding: 0.6rem 0.5rem;
+
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-direction: column;
+
         
+
         .grand-card{
-    position: relative;
-    height: auto;
-    width: 100%;
-    background-color: white;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
-    border-radius: 10px;
-    margin-right: 0;
-    padding: 0.8rem;
-    padding-bottom: 60px;
-    .card-top{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        p{
-            font-size: 1rem;
-        }
-        .icon{
-            cursor: pointer;
-        }
-    }
-    .details{
-        margin-top: 30px;
-        .detail{
-            border: none;
-            background-color: rgb(238, 238, 238);
+            height: auto;
             width: 100%;
-            padding: 0.75rem 1rem;
-            font-size: 0.8rem;
-            border: none;
-            outline: none;
-            margin-bottom: 5px;
-            border-radius: 5px;
-        }
-        .two-details{
-            display: flex;
-            justify-content: space-between;
-            flex-direction: column;
-            .detail{
-                width: 100%;
-            }
-            .custom-select{
-                width: 100%;
-                margin-bottom: 5px;
-                border-radius: 5px;
-                background-color: rgb(238, 238, 238);
-                display: grid;
-                place-items: center;
-                padding: 10px;
-                select{
-                    border: none;
-                    background-color: rgb(238, 238, 238);
-                    width: 100%;
-                    font-size: 0.8rem;
-                    border: none;
-                    outline: none;
-                    border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+            border-radius: 10px;
+            margin-right: 0%;
+            padding: 0.5rem;
+
+            .card-top{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                p{
+                    font-size: 1rem;
+                }
+
+                .icon{
                     cursor: pointer;
                 }
             }
+
+            .details{
+                margin-top: 20px;
+
+                .detail{
+                    display: flex;
+                    align-items: center;
+                    font-size: 0.8rem;
+                    margin-bottom: 10px;
+
+                    .cat{
+                        font-weight: 600;
+                    }
+
+                    .res{
+                        font-weight: 200;
+                        margin-left: 10px;
+                        font-size: 0.8rem;
+                    }
+                }
+            }
         }
-        textarea{
-            width: 100%;
-            height: 200px;
-        }
-    }
-    .submit-btn{
-        border: none;
-        background-color: cornflowerblue;
-        color: white;
-        font-size: 0.75rem;
-        padding: 0.75rem 1rem;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 100%;
-    }
-    .desc{
-        font-size: 0.6rem;
-        position: absolute;
-        bottom: 5px;
-        color: grey;
-        max-width: 90vw;
-    }
-}
-        .two-cards{
+
+        .multi-cards{
             height: auto;
             width: 100%;
+            margin-top: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 0;
+            padding-right: 0px;
+
             .card{
                 width: 100%;
-                height: 250px;
+                height: 80px;
                 background-color: white;
                 box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
                 border-radius: 10px;
-                margin-top: 10px;
-                margin-bottom: 0;
-                margin-right: 0;
-                padding: 20px;
+                margin-bottom: 10px;
+                margin-right: 1%;
+                padding: 10px;
                 display: flex;
-                flex-direction: column;
                 justify-content: space-between;
+                align-items: center;
     
-                .card-top{
+                img{
+                    height: 90%;
+                }
+
+                .text{
+                    flex: 1;
+                    margin-left: 10px;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-    
-                    p{
-                        font-size: 1rem;
+                    flex-direction: column;
+                    justify-content: center;
+                    
+                    .top{
+                        font-size: 0.9rem;
                     }
-    
-                    .icon{
-                        cursor: pointer;
+                    .link{
+                        font-size: 0.7rem;
                     }
-    
-                }
-                .card-mid{
-                    text-align: center;
-                    h1{
-                        color: orange;
-                        font-size: 5rem;
-                        line-height: 5rem;
-                    }
-                    p{
-                        color: orange;
-                        font-size: 0.8rem;
-                    }
-                    img{
-                        height: 7rem;
-                    }
-                }
-                .desc{
-                    font-size: 0.7rem;
-                    color: grey;
-                    text-align: center;
                 }
             }
         }
     }
+
     }
 `
 
@@ -1084,11 +985,13 @@ const CustomModal = styled.div`
     position: fixed;
     top: 0;
     z-index: 100;
+
     .touch-outside{
         height: 100vh;
         width: 100vw;
         background-color: #00000087;
     }    
+
     .container{
         height: auto;
         width: 50vw;
@@ -1098,6 +1001,7 @@ const CustomModal = styled.div`
         top: 35vh;
         left: 25vw;
         padding: 1rem;
+
         .desc{
             font-size: 0.9rem;
             color: grey;
@@ -1108,6 +1012,7 @@ const CustomModal = styled.div`
             width: 70%;
         }
     }
+
     .modalHeader{
         width: 100%;
         display: flex;
@@ -1128,6 +1033,7 @@ const SbComponentOne = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
         a{
             text-decoration: none;
             color: white;

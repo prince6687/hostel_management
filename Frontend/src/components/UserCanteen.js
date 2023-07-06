@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { useState,useEffect } from 'react';
+import { useState } from 'react';
 import Fade from 'react-reveal/Fade';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import TranslateIcon from '@material-ui/icons/Translate';
@@ -9,46 +9,38 @@ import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import HomeIcon from '@material-ui/icons/Home';
-import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import EmailIcon from '@material-ui/icons/Email';
-import AddIcon from '@material-ui/icons/Add';
-import AssignmentIcon from '@material-ui/icons/Assignment';
+import RoomIcon from '@material-ui/icons/Room';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import CachedIcon from '@material-ui/icons/Cached';
+import EmojiFoodBeverageIcon from '@material-ui/icons/EmojiFoodBeverage';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import LocalLaundryServiceIcon from '@material-ui/icons/LocalLaundryService';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
 import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ClearIcon from '@material-ui/icons/Clear';
+import AirlineSeatIndividualSuiteIcon from '@material-ui/icons/AirlineSeatIndividualSuite';
 import axios from 'axios';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 
-const Inbox = () => {
+const UserCanteen = () => {
     const [open, setOpen] = useState(false);
     const [sideBar, setSideBar] = useState(false);
-    const [showInbox, setShowInbox] = useState(false);
-    const [queries, setQueries] = useState([]) ;
-    const [student,setStudent] = useState({}) ;
-    const [reply,setReply] = useState("") ;
-    const user = sessionStorage ;
-    useEffect(()=>{
-        axios.post("http://localhost:8000/admin/findQueries",{
+    const [opencanteen, setCanteenopen] = useState([])
+    const [closedcanteen, setCanteenclose] = useState([])
+    const user = sessionStorage;
+    useEffect(() => {
+        axios.post("http://localhost:8000/canteens", {
             user
-        }).then(res =>{ 
-            console.log(res.data)
-            setQueries(res.data) ;
+        }).then(res => {
+            console.log(res.data);
+            setCanteenopen(res.data.canteens_open)
+            setCanteenclose(res.data.canteens_closed)
         })
-        .then(err => console.log(err)) ;
-    },[])
-    const onSend = ()=>{
-        console.log(reply) ;
-        axios.post("http://localhost:8000/admin/query/",{
-            user:sessionStorage ,
-            content: reply ,
-            query_id : student._id
-        }).then(res=>{
-            alert("Reply added Succesfully !!!") ;
-            window.location.href = "/admin/dashboard/inbox" ;
-        })
-    }
+            .catch(err => console.log(err));
+    }, [])
+
     return (
         <>
             {
@@ -79,7 +71,7 @@ const Inbox = () => {
                             Hosterr
                         </a>
                         <div className="admin mobile-only">
-                            Admin
+                            Student
                         </div>
                         <div className="together">
                             <button className="lang" onClick={() => setOpen(true)}>
@@ -110,172 +102,119 @@ const Inbox = () => {
                                 <MenuIcon className="left-icon-mob" />
                             </div>
                         </div>
-                        <Link to="/admin/dashboard/new-admin" className="left-item">
+                        <Link to="/user/dashboard/home" className="left-item">
                             <HomeIcon className="left-icon" />
                             Home
                         </Link>
-                        <Link to="/admin/dashboard/applications" className="left-item">
-                            <AssignmentIcon className="left-icon" />
-                            Applications
+                        <Link to="/user/dashboard/room/details" className="left-item">
+                            <RoomIcon className="left-icon" />
+                            Room details
                         </Link>
-                        <Link to="/admin/dashboard/hostel/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Hostel
+                        <Link to="/user/dashboard/room/change" className="left-item">
+                            <CachedIcon className="left-icon" />
+                            Room Change
                         </Link>
-                        <Link to="/admin/dashboard/room/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Rooms
+                        <Link to="/user/dashboard/canteen" className="left-item active">
+                            <EmojiFoodBeverageIcon className="left-icon" />
+                            Hostel Canteen
                         </Link>
-                        <Link to="/admin/dashboard/guest-room/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Guest House
+                        <Link to="/user/dashboard/guest-house/req" className="left-item">
+                            <AirlineSeatIndividualSuiteIcon className="left-icon" />
+                            Guest House
                         </Link>
-                        <Link to="/admin/dashboard/canteen/add" className="left-item">
-                            <AddIcon className="left-icon" />
-                            Add Canteen
-                        </Link>
-                        <Link to="/admin/dashboard/inbox" className="left-item active">
-                            <EmailIcon className="left-icon" />
-                            Indox
-                        </Link>
-                        <Link to="/admin/dashboard/accesslogs" className="left-item">
+                        <Link to="/user/dashboard/contact-admin" className="left-item">
                             <SupervisorAccountIcon className="left-icon" />
-                            Accommodation Details
+                            Contact Admin
                         </Link>
-                        <Link to="/admin/dashboard/profile" className="left-item">
+                        <Link to="/user/dashboard/profile" className="left-item">
                             <AccountCircleIcon className="left-icon" />
                             My profile
                         </Link>
                     </Left>
                     <Right>
                         <div className="head not-mobile">
-                            <h2>Admin Dashboard</h2>
+                            <h2>Student Dashboard</h2>
                             <div className="left-links">
-                                <p>Dashboard > Inbox</p>
-                                <button>
-                                    <ChatBubbleIcon className="icon" />
-                                    View Inbox
-                                </button>
+                                <p>Dashboard > Canteen</p>
+                                <Link to="/user/dashboard/contact-admin" className="left-item">
+                                    <button href="/user/dashboard/contact-admin">
+                                        <ChatBubbleIcon className="icon" />
+                                        Talk to Admin
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                         <div className="general">
-
-
+                            { opencanteen.length > 0 ? (
+                                opencanteen.map(item =>
+                                    <div className="card">
+                                        <div className="card-top">
+                                            <p>{item.name}</p>
+                                            <MoreVertIcon className="icon" />
+                                        </div>
+                                        <div className="card-mid">
+                                            <img src="https://abskitchen.co.in/onlineorder/img/defLogo.png?1537453188" alt="" />
+                                        </div>
+                                        <div className="status">Currently Open</div>
+                                        <div className="desc">This canteen can provide to with food anyday, in specific hours - <b>{item.start}hrs to {item.end} hrs</b>.
+                                            <br />  Contact : <a> {item.phone}</a></div>
+                                    </div>
+                                )
+                            ) : (<></>)
+                            }
                             {
-                                showInbox ? (
-                                    <div className="grand-card">
-                                        <div className="card-top">
-                                            <a onClick={() => setShowInbox(false)}>
-                                                <ArrowBackIosIcon className="icon-link" />
-                                                <>
-                                                    All Inboxes
-                                                </>
-                                            </a>
-                                            <MoreVertIcon className="icon" />
-                                        </div>
-                                        <div className="details2">
-                                            <div className="detail">
-                                                <p className="cat">Subject : </p>
-                                                <p className="res">{student.subject} </p>
+                                closedcanteen.length > 0 ? (
+                                    closedcanteen.map(item =>
+                                        <div className="card rjt-card">
+                                            <div className="card-top">
+                                                <p>{item.name}</p>
+                                                <MoreVertIcon className="icon" />
                                             </div>
-                                            <div className="detail">
-                                                <p className="cat">Content : </p>
-                                                <p className="res">{student.message}</p>
+                                            <div className="card-mid">
+                                                <img src="https://abskitchen.co.in/onlineorder/img/defLogo.png?1537453188" alt="" />
                                             </div>
-                                            <div className="reply">
-                                            <textarea name="" id="" className="detail" placeholder="Reply to the Inbox, write here..." onChange={(e)=>setReply(e.target.value)}></textarea>
-                                            </div>
+                                            <div className="status">Closed Currently</div>
+                                            <div className="desc">This canteen can provide to with food anyday, in specific hours - <b>{item.start}hrs to {item.end} hrs</b>.
+                                                <br />  Contact : <a> {item.phone}</a></div>
                                         </div>
-                                        <div className="btns-new">
-                                            <button className="btn" onClick={onSend}>Send Reply</button>
-                                            <button className="btn red-bg" onClick={() => setShowInbox(false)}>Cancel</button>
-                                        </div>
-                                        <div className="desc">*It is always advised to check the candiates profile to verify that it is not a fake profile.</div>
-                                    </div>
-
-                                ) : (
-                                    <div className="grand-card">
-                                        <div className="card-top">
-                                            <p>Inboxes</p>
-                                            <MoreVertIcon className="icon" />
-                                        </div>
-                                        <div className="details">
-                                            <div className="detail detail-header">
-                                                <div className="room-no">S. no.</div>
-                                                <div className="hostel-name">Subject</div>
-                                                <div className="resident">View</div>
-                                                
-                                            </div>
-                                            {
-                                                queries.length>0?(
-                                                queries.map((item,index)=>
-                                                    <div className="detail">
-                                                    <div className="room-no">{index+1}</div>
-                                                    <div className="hostel-name">{item.subject}</div>
-                                                    <a className="resident" onClick={() =>{setShowInbox(true) ; setStudent(item) }}>
-                                                        <>View Detailed</>
-                                                        <OpenInNewIcon className="icon" /></a>
-                                                </div>)):(<div>No current Messages</div>)
-                                            }
-                                        </div>
-                                    </div>
-
+                                    )
+                                ) : (<></>)
+                            }
+                            {
+                                closedcanteen.length + opencanteen.length == 0 ? (
+                                    <h3>You don't have any canteen!</h3>
+                                ):(
+                                    <></>
                                 )
                             }
 
 
-
-                            <div className="two-cards">
-                                <div className="card">
-                                    <div className="card-top">
-                                        <p>Pending</p>
-                                        <MoreVertIcon className="icon" />
-                                    </div>
-                                    <div className="card-mid">
-                                        <h1>{queries.length}</h1>
-                                        <p>queries Pending</p>
-                                    </div>
-                                    <div className="desc">These are the number of queries you have not addressed!</div>
-                                </div>
-                                <div className="card">
-                                    <div className="card-top">
-                                        <p>Fees Pending</p>
-                                        <MoreVertIcon className="icon" />
-                                    </div>
-                                    <div className="card-mid">
-                                        <h1>8</h1>
-                                        <p>students with pending fees</p>
-                                    </div>
-                                    <div className="desc">This is the count of students who has not deposited the fees till date.</div>
-                                </div>
-                            </div>
+                            {/* code */}
                         </div>
-
                     </Right>
                 </div>
             </Container>
 
             <SideBar className={`${sideBar ? 'sidebar show-sidebar' : 'sidebar'}`}>
                 <SbComponentOne>
-                    <Link to="/admin/dashboard/new-admin">Home</Link>
-                    <Link to="/admin/dashboard/queries">queries</Link>
-                    <Link to="/admin/dashboard/hostel/add">Add Hostel</Link>
-                    <Link to="/admin/dashboard/room/add">Add Rooms</Link>
-                    <Link to="/admin/dashboard/guest-room/add">Add Guest House</Link>
-                    <Link to="/admin/dashboard/canteen/add">Add Canteen</Link>
-                    <Link to="/admin/dashboard/inbox">Inbox</Link>
-                    <Link to="/admin/dashboard/accesslogs">Accommodation Details</Link>
-                    <Link to="/admin/dashboard/profile">My Profile</Link>
+                    <Link to="/user/dashboard/home">Home</Link>
+                    <Link to="/user/dashboard/room/details">Room Details</Link>
+                    <Link to="/user/dashboard/room/change">Room Change</Link>
+                    <Link to="/user/dashboard/contact-admin">Contact Admin</Link>
+                    <Link to="/user/dashboard/canteen">Canteen</Link>
+                    <Link to="/user/dashboard/guest-house/req">Guest House</Link>
+                    <Link to="/user/dashboard/profile">My profile</Link>
                 </SbComponentOne>
                 <RemoveSideBar onClick={(e) => setSideBar(false)}>
                     <ClearIcon style={{ cursor: "pointer", fontSize: '1.5rem', fill: 'white' }} />
                 </RemoveSideBar>
             </SideBar>
+
         </>
     )
 }
 
-export default Inbox
+export default UserCanteen
 
 const Container = styled.div`
     min-height: 100vh;
@@ -606,11 +545,122 @@ const Right = styled.div`
         padding: 1.2rem;
         padding-right: 0;
         display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        
+        .card{
+            width: 32%;
+            height: 250px;
+            background-color: white;
+            margin-bottom: 10px;
+            margin-right: 1%;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            .card-top{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                p{
+                    font-size: 1rem;
+                }
+                .icon{
+                    cursor: pointer;
+                }
+            }
+            .status{
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                text-align: center;
+                font-weight: 700;
+                color: orange;
+                letter-spacing: 0.15rem;
+            }
+            .card-mid{
+                text-align: center;
+                h1{
+                    color: orange;
+                    font-size: 5rem;
+                    line-height: 5rem;
+                }
+                p{
+                    color: orange;
+                    font-size: 0.8rem;
+                }
+                img{
+                    height: 7rem;
+                    width: 7rem;
+                    border-radius: 50%;
+                }
+            }
+            .desc{
+                font-size: 0.7rem;
+                color: grey;
+                text-align: center;
+            }
+        }
+        .rjt-card{
+            background-color: #af5e54;
+            .card-top{
+                p{
+                    font-size: 1rem;
+                    color: white;
+                }
+                .icon{
+                    cursor: pointer;
+                    fill: white;
+                }
+            }
+            .status{
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                text-align: center;
+                font-weight: 700;
+                color: orange;
+                letter-spacing: 0.15rem;
+            }
+            .card-mid{
+                text-align: center;
+                h1{
+                    color: orange;
+                    font-size: 5rem;
+                    line-height: 5rem;
+                }
+                p{
+                    color: orange;
+                    font-size: 0.8rem;
+                }
+                img{
+                    height: 7rem;
+                    width: 7rem;
+                    border-radius: 50%;
+                }
+            }
+            .desc{
+                font-size: 0.7rem;
+                color: #d1c3c3;
+                text-align: center;
+                b{
+                    color: #d1c3c3;
+                }
+                a{
+                    color: #4b307c;
+                }
+            }
+        }
+    }
+    .general2{
+        padding: 1.2rem;
+        padding-right: 0;
+        display: flex;
         justify-content: space-between;
         /* align-items: center; */
         .grand-card{
     position: relative;
-    height: auto;
+    height: 512px;
     width: 74%;
     background-color: white;
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
@@ -627,106 +677,28 @@ const Right = styled.div`
         .icon{
             cursor: pointer;
         }
-        a{
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            
-            .icon-link{
-                font-size: 1.2rem;
-            }
-        }
     }
     .details{
         margin-top: 30px;
         .detail{
+            border: none;
+            background-color: rgb(238, 238, 238);
             width: 100%;
-            background-color: #f5e8e8;
-            padding: 0.5rem;
-            border-radius: 5px; 
-            margin-bottom: 5px;  
+            padding: 0.75rem 1rem;
             font-size: 0.8rem;
-            font-weight: 300;
-
-            display: flex;
-            align-items: center;
-
-            div{
-                overflow: hidden;
-            }
-            
-            .room-no{
-                width: 15%;
-                border-right: 1px solid #d1b9b9;
-                display: flex;
-                justify-content: center;
-            }       
-            
-            .hostel-name{
-                flex: 1;
-                border-right: 1px solid #d1b9b9;
-                display: flex;
-                justify-content: center;
-            }
-
-
-            .fees{
-                width: 15%;
-                display: flex;
-                justify-content: center;
-            }
-            
-            .resident{
-                width: 20%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                .icon{
-                    fill: cornflowerblue;
-                    font-size: 1rem;
-                    margin-left: 2px;
-                }
-            }
-            
-            /*code here - desktop */
+            border: none;
+            outline: none;
+            margin-bottom: 5px;
+            border-radius: 5px;
         }
-
-        .detail-header{
-            background-color: #585353;
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 600;
-
-
-            .room-no{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .hostel-name{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .gender{
-                color: white;
-                border-right: 1px solid #977777;
-            }
-            .fees{
-                color: white;
-            }
-            .resident{
-                color: white;
-            }
-        }
-
         .two-details{
             display: flex;
             justify-content: space-between;
             .detail{
                 width: 49.5%;
             }
-            
-            .custom-select{
+        }
+        .custom-select{
                 width: 49.5%;
                 margin-bottom: 5px;
                 border-radius: 5px;
@@ -745,73 +717,11 @@ const Right = styled.div`
                     cursor: pointer;
                 }
             }
-        }
         textarea{
             width: 100%;
             height: 200px;
         }
     }
-
-    .btns-new{
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            
-            .btn{
-                padding: 8px 10px;
-                cursor: pointer;
-                border-radius: 5px;
-                margin-right: 5px;
-                border: none;
-                font-size: 0.8rem;
-                background-color: #7690bf;
-                color: white;
-            }
-
-            .red-bg{
-                background-color: #d16969;
-            }
-        }
-
-    .details2{
-        margin-top: 30px;
-
-        .detail{
-            display: flex;
-            align-items: flex-start;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-
-            .cat{
-                font-weight: 600;
-                min-width: 100px;
-            }
-
-            .res{
-                font-weight: 200;
-                margin-left: 10px;
-                font-size: 0.85rem;
-            }
-
-        }
-
-        .reply{
-            margin-top: 25px;
-            textarea{
-                width: 100%;
-                height: 200px;
-                padding: 1rem;
-                font-size: 0.8rem;
-                background-color: #efeded;
-                outline: none;
-                border: none;
-                border-radius: 5px;
-            }
-        }
-
-        
-    }
-            
     .submit-btn{
         border: none;
         background-color: cornflowerblue;
@@ -822,7 +732,7 @@ const Right = styled.div`
         cursor: pointer;
     }
     .desc{
-        font-size: 0.7rem;
+        font-size: 0.6rem;
         position: absolute;
         bottom: 5px;
         color: grey;
@@ -927,6 +837,54 @@ const Right = styled.div`
             }
         }
         .general{
+            padding: 0.5rem;
+            display: flex;
+            justify-content: flex-start;
+            margin: 5px 0 15px 0;
+            .card{
+                width: 100%;
+                height: 270px;
+                margin-right: 0;
+                border-radius: 10px;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                .card-top{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    p{
+                        font-size: 1rem;
+                    }
+                    .icon{
+                        cursor: pointer;
+                    }
+                }
+                .card-mid{
+                    text-align: center;
+                    h1{
+                        color: orange;
+                        font-size: 5rem;
+                        line-height: 5rem;
+                    }
+                    p{
+                        color: orange;
+                        font-size: 0.8rem;
+                    }
+                    img{
+                        height: 7rem;
+                    }
+                }
+                .desc{
+                    font-size: 0.7rem;
+                    color: grey;
+                    text-align: center;
+                }
+            }
+        }
+        .general2{
         padding: 0.6rem 0.5rem;
         display: flex;
         justify-content: space-between;
@@ -974,7 +932,8 @@ const Right = styled.div`
             .detail{
                 width: 100%;
             }
-            .custom-select{
+        }
+        .custom-select{
                 width: 100%;
                 margin-bottom: 5px;
                 border-radius: 5px;
@@ -993,7 +952,6 @@ const Right = styled.div`
                     cursor: pointer;
                 }
             }
-        }
         textarea{
             width: 100%;
             height: 200px;

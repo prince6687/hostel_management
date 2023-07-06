@@ -21,33 +21,37 @@ import ClearIcon from '@material-ui/icons/Clear';
 import axios from 'axios';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 
-const Inbox = () => {
+const Applications = () => {
     const [open, setOpen] = useState(false);
     const [sideBar, setSideBar] = useState(false);
-    const [showInbox, setShowInbox] = useState(false);
-    const [queries, setQueries] = useState([]) ;
+    const [showApplication, setShowApplication] = useState(false);
+    const [applications, setApplications] = useState([]) ;
     const [student,setStudent] = useState({}) ;
-    const [reply,setReply] = useState("") ;
     const user = sessionStorage ;
     useEffect(()=>{
-        axios.post("http://localhost:8000/admin/findQueries",{
+        axios.post("http://localhost:8000/admin/findApplications",{
             user
         }).then(res =>{ 
             console.log(res.data)
-            setQueries(res.data) ;
+            setApplications(res.data) ;
         })
         .then(err => console.log(err)) ;
     },[])
-    const onSend = ()=>{
-        console.log(reply) ;
-        axios.post("http://localhost:8000/admin/query/",{
-            user:sessionStorage ,
-            content: reply ,
-            query_id : student._id
-        }).then(res=>{
-            alert("Reply added Succesfully !!!") ;
-            window.location.href = "/admin/dashboard/inbox" ;
-        })
+    const onAllotroom = ()=>{
+       axios.post("http://localhost:8000/admin/application/accept",{
+           application_id:student._id
+       }).then(res =>{
+              alert(res.data) ;
+             // window.location.href = "/admin/dashboard/applications" ;
+       }).catch(err => console.log(err))
+    }
+    const onRejectroom = ()=>{
+        axios.post("http://localhost:8000/admin/application/reject",{
+            application_id : student._id
+        }).then(res =>{
+               alert(res.data) ;
+              // window.location.href = "/admin/dashboard/applications" ;
+        }).catch(err => console.log(err))  
     }
     return (
         <>
@@ -114,9 +118,9 @@ const Inbox = () => {
                             <HomeIcon className="left-icon" />
                             Home
                         </Link>
-                        <Link to="/admin/dashboard/applications" className="left-item">
+                        <Link to="/admin/dashboard/applications" className="left-item active">
                             <AssignmentIcon className="left-icon" />
-                            Applications
+                            applications
                         </Link>
                         <Link to="/admin/dashboard/hostel/add" className="left-item">
                             <AddIcon className="left-icon" />
@@ -134,7 +138,7 @@ const Inbox = () => {
                             <AddIcon className="left-icon" />
                             Add Canteen
                         </Link>
-                        <Link to="/admin/dashboard/inbox" className="left-item active">
+                        <Link to="/admin/dashboard/inbox" className="left-item">
                             <EmailIcon className="left-icon" />
                             Indox
                         </Link>
@@ -151,9 +155,8 @@ const Inbox = () => {
                         <div className="head not-mobile">
                             <h2>Admin Dashboard</h2>
                             <div className="left-links">
-                                <p>Dashboard > Inbox</p>
+                                <p>Dashboard > Applications</p>
                                 <button>
-                                    <ChatBubbleIcon className="icon" />
                                     View Inbox
                                 </button>
                             </div>
@@ -162,33 +165,50 @@ const Inbox = () => {
 
 
                             {
-                                showInbox ? (
+                                showApplication ? (
                                     <div className="grand-card">
                                         <div className="card-top">
-                                            <a onClick={() => setShowInbox(false)}>
+                                            <a onClick={() => setShowApplication(false)}>
                                                 <ArrowBackIosIcon className="icon-link" />
                                                 <>
-                                                    All Inboxes
+                                                    All applications
                                                 </>
                                             </a>
                                             <MoreVertIcon className="icon" />
                                         </div>
                                         <div className="details2">
                                             <div className="detail">
-                                                <p className="cat">Subject : </p>
-                                                <p className="res">{student.subject} </p>
+                                                <p className="cat">1. Subject :</p>
+                                                <p className="res"> {student.status == null ?(<span>New Room Allocate</span>):(<span>Room Change</span>)}</p>
                                             </div>
                                             <div className="detail">
-                                                <p className="cat">Content : </p>
-                                                <p className="res">{student.message}</p>
+                                                <p className="cat">2. Name :</p>
+                                                <a href="" className="res">{student.student_id.name}</a>
                                             </div>
-                                            <div className="reply">
-                                            <textarea name="" id="" className="detail" placeholder="Reply to the Inbox, write here..." onChange={(e)=>setReply(e.target.value)}></textarea>
+                                            <div className="detail">
+                                                <p className="cat">3. Gender : </p>
+                                                <p className="res">{student.student_id.gender == "Boys" ?(<span>Male</span>):(<span>Female</span>)}</p>
+                                            </div>
+                                            <div className="detail">
+                                                <p className="cat">4. Year Of Study : </p>
+                                                <p className="res">{student.student_id.year}</p>
+                                            </div>
+                                            <div className="detail">
+                                                <p className="cat">5. Contact Number : </p>
+                                                <p className="res">{student.student_id.phone}</p>
+                                            </div>
+                                            <div className="detail">
+                                                <p className="cat">7. Local Address : </p>
+                                                <p className="res">{student.student_id.address}</p>
+                                            </div>
+                                            <div className="detail">
+                                                <p className="cat">8. Physically challenged : </p>
+                                                <p className="res">{student.student_disability?(<span>YES</span>):(<span>NO</span>)}</p>
                                             </div>
                                         </div>
                                         <div className="btns-new">
-                                            <button className="btn" onClick={onSend}>Send Reply</button>
-                                            <button className="btn red-bg" onClick={() => setShowInbox(false)}>Cancel</button>
+                                            <button className="btn" onClick={onAllotroom}>Allot Room</button>
+                                            <button className="btn red-bg" onClick={onRejectroom}>Reject Application</button>
                                         </div>
                                         <div className="desc">*It is always advised to check the candiates profile to verify that it is not a fake profile.</div>
                                     </div>
@@ -196,28 +216,78 @@ const Inbox = () => {
                                 ) : (
                                     <div className="grand-card">
                                         <div className="card-top">
-                                            <p>Inboxes</p>
+                                            <p>Applications</p>
                                             <MoreVertIcon className="icon" />
                                         </div>
+                                        { applications.length>0?(
+                                            <div className="details">
+                                              <div className="detail detail-header">
+                                                <div className="room-no">S. no.</div>
+                                                <div className="hostel-name">Subject</div>
+                                                <div className="gender">Gender</div>
+                                                <div className="fees">Mark</div>
+                                                <div className="resident">View</div>
+                                            </div>
+                                            {applications.map(item=><div className="detail">
+                                                <div className="room-no">1</div>
+                                                <div className="hostel-name">{item.status == null ?(<span>New Room Allocate</span>):(<span>Room Change</span>)}</div>
+                                                <div className="gender">{item.student_id.gender == "Boys" ?(<span>Male</span>):(<span>Female</span>)}</div>
+                                                <div className="fees">{item.status == "RJ"?(<span>Rejected</span>):(<span>-</span>)}</div>
+                                                <a className="resident" onClick={() =>{setStudent(item) ; setShowApplication(true)}}>
+                                                    <>View Detailed</>
+                                                    <OpenInNewIcon className="icon" /></a>
+                                            </div>)
+                                            }  
+                                            </div>
+                                        ):(<div>No more pending Applications to show</div>)
+                                        }
+                                        {/*
                                         <div className="details">
                                             <div className="detail detail-header">
                                                 <div className="room-no">S. no.</div>
                                                 <div className="hostel-name">Subject</div>
+                                                <div className="gender">Gender</div>
+                                                <div className="fees">Mark</div>
                                                 <div className="resident">View</div>
-                                                
                                             </div>
-                                            {
-                                                queries.length>0?(
-                                                queries.map((item,index)=>
-                                                    <div className="detail">
-                                                    <div className="room-no">{index+1}</div>
-                                                    <div className="hostel-name">{item.subject}</div>
-                                                    <a className="resident" onClick={() =>{setShowInbox(true) ; setStudent(item) }}>
-                                                        <>View Detailed</>
-                                                        <OpenInNewIcon className="icon" /></a>
-                                                </div>)):(<div>No current Messages</div>)
-                                            }
+                                            <div className="detail">
+                                                <div className="room-no">1</div>
+                                                <div className="hostel-name">New Room</div>
+                                                <div className="gender">Female</div>
+                                                <div className="fees"> - </div>
+                                                <a className="resident" onClick={() => setShowApplication(true)}>
+                                                    <>View Detailed</>
+                                                    <OpenInNewIcon className="icon" /></a>
+                                            </div>
+                                            <div className="detail">
+                                                <div className="room-no">2</div>
+                                                <div className="hostel-name">New Room</div>
+                                                <div className="gender">Female</div>
+                                                <div className="fees"> - </div>
+                                                <a className="resident" onClick={() => setShowApplication(true)}>
+                                                    <>View Detailed</>
+                                                    <OpenInNewIcon className="icon" /></a>
+                                            </div>
+                                            <div className="detail">
+                                                <div className="room-no">3</div>
+                                                <div className="hostel-name">New Room</div>
+                                                <div className="gender">Female</div>
+                                                <div className="fees"> - </div>
+                                                <a className="resident" onClick={() => setShowApplication(true)}>
+                                                    <>View Detailed</>
+                                                    <OpenInNewIcon className="icon" /></a>
+                                            </div>
+                                            <div className="detail">
+                                                <div className="room-no">4</div>
+                                                <div className="hostel-name">New Room</div>
+                                                <div className="gender">Female</div>
+                                                <div className="fees"> - </div>
+                                                <a className="resident" onClick={() => setShowApplication(true)}>
+                                                    <>View Detailed</>
+                                                    <OpenInNewIcon className="icon" /></a>
+                                            </div>
                                         </div>
+                                        */}
                                     </div>
 
                                 )
@@ -232,21 +302,21 @@ const Inbox = () => {
                                         <MoreVertIcon className="icon" />
                                     </div>
                                     <div className="card-mid">
-                                        <h1>{queries.length}</h1>
-                                        <p>queries Pending</p>
+                                        <h1>{applications.length}</h1>
+                                        <p>Applications Pending</p>
                                     </div>
-                                    <div className="desc">These are the number of queries you have not addressed!</div>
+                                    <div className="desc">These are the number of applications you have not addressed!</div>
                                 </div>
                                 <div className="card">
                                     <div className="card-top">
-                                        <p>Fees Pending</p>
+                                        <p>Share Link</p>
                                         <MoreVertIcon className="icon" />
                                     </div>
                                     <div className="card-mid">
-                                        <h1>8</h1>
-                                        <p>students with pending fees</p>
+                                        <img src="https://cdn1.iconfinder.com/data/icons/web-design-and-development-50/64/110-512.png" alt="" />
                                     </div>
-                                    <div className="desc">This is the count of students who has not deposited the fees till date.</div>
+                                    <div className="desc">Ask students to join their hostel with a flex in hand, faster and easier.
+                                        <a> Share</a></div>
                                 </div>
                             </div>
                         </div>
@@ -258,7 +328,7 @@ const Inbox = () => {
             <SideBar className={`${sideBar ? 'sidebar show-sidebar' : 'sidebar'}`}>
                 <SbComponentOne>
                     <Link to="/admin/dashboard/new-admin">Home</Link>
-                    <Link to="/admin/dashboard/queries">queries</Link>
+                    <Link to="/admin/dashboard/applications">Applications</Link>
                     <Link to="/admin/dashboard/hostel/add">Add Hostel</Link>
                     <Link to="/admin/dashboard/room/add">Add Rooms</Link>
                     <Link to="/admin/dashboard/guest-room/add">Add Guest House</Link>
@@ -275,7 +345,7 @@ const Inbox = () => {
     )
 }
 
-export default Inbox
+export default Applications
 
 const Container = styled.div`
     min-height: 100vh;
@@ -663,19 +733,26 @@ const Right = styled.div`
             }       
             
             .hostel-name{
-                flex: 1;
+                width: 35%;
                 border-right: 1px solid #d1b9b9;
                 display: flex;
                 justify-content: center;
             }
 
-
-            .fees{
+            .gender{
                 width: 15%;
+                border-right: 1px solid #d1b9b9;
                 display: flex;
                 justify-content: center;
             }
-            
+
+            .fees{
+                width: 15%;
+                border-right: 1px solid #d1b9b9;
+                display: flex;
+                justify-content: center;
+            }
+
             .resident{
                 width: 20%;
                 display: flex;
@@ -713,6 +790,7 @@ const Right = styled.div`
             }
             .fees{
                 color: white;
+                border-right: 1px solid #977777;
             }
             .resident{
                 color: white;
@@ -753,7 +831,7 @@ const Right = styled.div`
     }
 
     .btns-new{
-            margin-top: 10px;
+            margin-top: 30px;
             display: flex;
             align-items: center;
             
@@ -778,34 +856,18 @@ const Right = styled.div`
 
         .detail{
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             font-size: 0.9rem;
             margin-bottom: 10px;
 
             .cat{
                 font-weight: 600;
-                min-width: 100px;
             }
 
             .res{
                 font-weight: 200;
                 margin-left: 10px;
                 font-size: 0.85rem;
-            }
-
-        }
-
-        .reply{
-            margin-top: 25px;
-            textarea{
-                width: 100%;
-                height: 200px;
-                padding: 1rem;
-                font-size: 0.8rem;
-                background-color: #efeded;
-                outline: none;
-                border: none;
-                border-radius: 5px;
             }
         }
 
