@@ -3,8 +3,8 @@ Our website is specifically designed to cater to the unique needs and well-being
 The name of this website is Hosterr.
 
 ## Features
--  Login/ Signup for students and Admin.
--  Provides information and features for users staying in guest rooms.
++  Login/ Signup for students and Admin.
++  Provides information and features for users staying in guest rooms.
 +  Allows users to view and interact with the hostel canteen.
 +  A messaging system for communication within the application
 +  Admin database page for managing data.
